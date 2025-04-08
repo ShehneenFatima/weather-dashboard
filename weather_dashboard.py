@@ -91,35 +91,95 @@ def process_data(weather_data):
     return df
 
 
+def print_weather_stats(df):
+    """Print weather statistics such as average temperature, max/min temperature, and max wind speed."""
+    avg_temp = df["temperature_average"].mean()
+    max_temp = df["temperature_2m_max"].max()
+    min_temp = df["temperature_2m_min"].min()
+    max_windspeed = df["windspeed_10m_max"].max()
+
+    print("Weather Data Summary:")
+    print("----------------------")
+    print(f"Date Range: {df.index[0].date()} to {df.index[-1].date()}")
+    print(f"Average Temperature (°C): {avg_temp:.2f}")
+    print(f"Max Temperature (°C): {max_temp:.2f}")
+    print(f"Min Temperature (°C): {min_temp:.2f}")
+    print(f"Max Windspeed (m/s): {max_windspeed:.2f}")
+    print()
+
+
 def plot_graphs(df):
     """Plot graphs."""
+    # Plot Average Temperature Over Time
     plt.figure(figsize=(10, 5))
-    plt.subplot(2, 1, 1)
+
+    plt.subplot(3, 1, 1)
     plt.plot(
         df.index,
         df["temperature_average"],
         marker="o",
         linestyle="-",
+        color="red",
+        label="Average Temperature",
     )
     plt.title("Average Temperature Over Time")
     plt.xlabel("Date")
     plt.ylabel("Temperature (°C)")
     plt.xticks(rotation=45)
     plt.grid(True)
+
+    # Plot Max Temperature Over Time
+    plt.subplot(3, 1, 2)
+    plt.plot(
+        df.index,
+        df["temperature_2m_max"],
+        marker="o",
+        linestyle="-",
+        color="orange",
+        label="Max Temperature",
+    )
+    plt.title("Max Temperature Over Time")
+    plt.xlabel("Date")
+    plt.ylabel("Temperature (°C)")
+    plt.xticks(rotation=45)
+    plt.grid(True)
+
+    # Plot Min Temperature Over Time
+    plt.subplot(3, 1, 3)
+    plt.plot(
+        df.index,
+        df["temperature_2m_min"],
+        marker="o",
+        linestyle="-",
+        color="blue",
+        label="Min Temperature",
+    )
+    plt.title("Min Temperature Over Time")
+    plt.xlabel("Date")
+    plt.ylabel("Temperature (°C)")
+    plt.xticks(rotation=45)
+    plt.grid(True)
+
+    # Adjust layout for spacing between graphs
+    plt.subplots_adjust(hspace=0.4)
+
+    # Save graph to a file instead of showing it interactively
     plt.tight_layout()
-    plt.show()
+    plt.savefig("weather_dashboard_plot.png")  # Save as PNG image
+    print("Graph saved as weather_dashboard_plot.png")
+
+    # Optionally, close the plot to free up resources
+    plt.close()
 
 
 def main():
     """Main function to orchestrate the weather data analysis process."""
     args = parse_arguments()
     weather_data = fetch_weather_data(
-        args.latitude,
-        args.longitude,
-        args.start_date,
-        args.end_date,
+        args.latitude, args.longitude, args.start_date, args.end_date
     )
     df = process_data(weather_data)
+    print_weather_stats(df)
     plot_graphs(df)
 
 
